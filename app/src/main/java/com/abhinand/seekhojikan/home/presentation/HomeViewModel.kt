@@ -58,25 +58,30 @@ class HomeViewModel @Inject constructor(
                                 animeList = newList,
                                 isLoading = false,
                                 isRefreshing = false,
-                                isLoadingNextPage = false
+                                isLoadingNextPage = false,
+                                isNetworkError = false
                             )
                         } else {
                             it.copy(
                                 animeList = it.animeList + newList,
                                 isLoading = false,
                                 isRefreshing = false,
-                                isLoadingNextPage = false
+                                isLoadingNextPage = false,
+                                isNetworkError = false
                             )
                         }
                     }
                 }
                 is NetworkResource.Error -> {
                     _uiState.update {
+                        val isNetworkError =
+                            result.message?.contains("Unable to resolve host") == true
                         it.copy(
-                            error = result.message,
+                            error = if (isNetworkError) null else result.message,
                             isLoading = false,
                             isRefreshing = false,
-                            isLoadingNextPage = false
+                            isLoadingNextPage = false,
+                            isNetworkError = isNetworkError
                         )
                     }
                 }

@@ -8,5 +8,6 @@ data class HomeState(
     val error: String? = null,
     val isRefreshing: Boolean = false,
     val page: Int = 1,
-    val isLoadingNextPage: Boolean = false
+    val isLoadingNextPage: Boolean = false,
+    val isNetworkError: Boolean = false
 )
