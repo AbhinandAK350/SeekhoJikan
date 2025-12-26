@@ -9,7 +9,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.abhinand.seekhojikan.details.DetailsScreen
+import com.abhinand.seekhojikan.details.presentation.DetailsScreen
 import com.abhinand.seekhojikan.home.presentation.HomeScreen
 
 @Composable

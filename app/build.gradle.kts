@@ -22,7 +22,7 @@ android {
 
         buildConfigField(
             "String", "API_URL",
-            "\"https://api.jikan.moe/\""
+            "\"https://api.jikan.moe/v4/\""
         )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

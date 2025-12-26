@@ -5,7 +5,7 @@ import retrofit2.http.GET
 
 interface HomeApiService {
 
-    @GET("v4/top/anime")
+    @GET("top/anime")
     suspend fun getTopAnime(): TopAnimeResponseDto
 
 }
