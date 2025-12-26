@@ -13,10 +13,10 @@ interface AnimeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAnimeList(animeList: List<AnimeEntity>)
 
-    @Query("SELECT * FROM anime")
+    @Query("SELECT * FROM anime ORDER BY rank IS NULL, rank ASC")
     suspend fun getAnimeList(): List<AnimeEntity>
 
-    @Query("SELECT * FROM anime LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM anime ORDER BY rank IS NULL, rank ASC LIMIT :limit OFFSET :offset")
     suspend fun getAnimeList(limit: Int, offset: Int): List<AnimeEntity>
 
     @Query("SELECT * FROM anime WHERE malId = :id")
