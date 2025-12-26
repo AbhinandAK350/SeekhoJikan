@@ -16,10 +16,16 @@ interface AnimeDao {
     @Query("SELECT * FROM anime")
     suspend fun getAnimeList(): List<AnimeEntity>
 
+    @Query("SELECT * FROM anime LIMIT :limit OFFSET :offset")
+    suspend fun getAnimeList(limit: Int, offset: Int): List<AnimeEntity>
+
     @Query("SELECT * FROM anime WHERE malId = :id")
     suspend fun getAnime(id: Int): AnimeEntity?
 
     @Update
     suspend fun updateAnime(anime: AnimeEntity)
+
+    @Query("DELETE FROM anime")
+    suspend fun clearAll()
 
 }

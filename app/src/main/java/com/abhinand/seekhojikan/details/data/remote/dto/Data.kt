@@ -1,5 +1,6 @@
 package com.abhinand.seekhojikan.details.data.remote.dto
 
+import com.abhinand.seekhojikan.home.data.remote.dto.NamedResourceDto
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -17,6 +18,6 @@ data class Data(
     val score: Float?,
     val synopsis: String?,
     val year: Int?,
-    val genres: List<Genre>,
+    val genres: List<NamedResourceDto>,
     val studios: List<Studio>
 )

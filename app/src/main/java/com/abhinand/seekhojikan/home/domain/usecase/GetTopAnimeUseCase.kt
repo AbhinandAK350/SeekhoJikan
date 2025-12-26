@@ -9,7 +9,10 @@ import javax.inject.Inject
 class GetTopAnimeUseCase @Inject constructor(
     private val repository: HomeRepository
 ) {
-    operator fun invoke(): Flow<NetworkResource<List<Anime>>> {
-        return repository.getAnimeList()
+    operator fun invoke(
+        forceRefresh: Boolean = false,
+        page: Int
+    ): Flow<NetworkResource<List<Anime>>> {
+        return repository.getAnimeList(forceRefresh, page)
     }
 }

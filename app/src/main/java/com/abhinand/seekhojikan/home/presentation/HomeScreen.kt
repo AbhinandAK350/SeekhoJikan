@@ -11,7 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,6 +43,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val listState = rememberLazyListState()
 
     Scaffold(
         topBar = {
@@ -58,7 +61,7 @@ fun HomeScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
 
-                uiState.error != null -> {
+                uiState.error != null && uiState.animeList.isEmpty() -> {
                     Text(
                         text = uiState.error!!,
                         modifier = Modifier.align(Alignment.Center)
@@ -66,12 +69,32 @@ fun HomeScreen(
                 }
 
                 else -> {
-                    LazyColumn {
-                        items(uiState.animeList) { anime ->
+                    LazyColumn(state = listState) {
+                        itemsIndexed(
+                            uiState.animeList,
+                            key = { _, anime -> anime.malId }) { index, anime ->
                             AnimeListItem(anime = anime, onItemClick = {
                                 onNavigate(Action.Push(Screen.Details(it)))
                             })
+
+                            if (index == uiState.animeList.size - 1 && !uiState.isLoadingNextPage) {
+                                LaunchedEffect(Unit) {
+                                    viewModel.onEvent(HomeEvent.OnLoadNextPage)
+                                }
+                            }
                         }
+                        if (uiState.isLoadingNextPage) {
+                            item {
+                                Box(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)) {
+                                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                                }
+                            }
+                        }
+                    }
+                    if (uiState.isRefreshing) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
                 }
             }
@@ -97,7 +120,7 @@ fun AnimeListItem(anime: Anime, onItemClick: (Anime) -> Unit) {
             contentScale = ContentScale.Crop,
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Column(modifier = Modifier.align(Alignment.CenterVertically)) {
+        Column {
             Text(
                 text = anime.title,
                 style = MaterialTheme.typography.titleLarge

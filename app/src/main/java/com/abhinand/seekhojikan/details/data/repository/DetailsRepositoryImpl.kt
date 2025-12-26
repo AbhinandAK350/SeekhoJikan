@@ -3,6 +3,7 @@ package com.abhinand.seekhojikan.details.data.repository
 import com.abhinand.seekhojikan.core.network.NetworkResource
 import com.abhinand.seekhojikan.details.data.mapper.toDetailsDomain
 import com.abhinand.seekhojikan.details.data.mapper.toDomain
+import com.abhinand.seekhojikan.details.data.mapper.toEntity
 import com.abhinand.seekhojikan.details.data.remote.api.DetailsApiService
 import com.abhinand.seekhojikan.details.domain.model.AnimeDetails
 import com.abhinand.seekhojikan.details.domain.repository.DetailsRepository
@@ -19,8 +20,10 @@ class DetailsRepositoryImpl @Inject constructor(
 
     override fun getAnimeDetails(id: Int): Flow<NetworkResource<AnimeDetails>> = flow {
         emit(NetworkResource.Loading)
+
         try {
             val animeDetails = apiService.getAnimeDetails(id).toDomain()
+            animeDao.updateAnime(animeDetails.toEntity())
 
             emit(NetworkResource.Success(animeDetails))
         } catch (e: IOException) {
