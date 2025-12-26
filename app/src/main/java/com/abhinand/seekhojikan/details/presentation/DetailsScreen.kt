@@ -1,15 +1,28 @@
 package com.abhinand.seekhojikan.details.presentation
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,13 +33,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.abhinand.seekhojikan.core.navigation.Action
+import com.abhinand.seekhojikan.home.data.remote.dto.NamedResourceDto
 import com.abhinand.seekhojikan.home.domain.model.Anime
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -77,10 +99,29 @@ fun DetailsScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(250.dp),
+                                    .height(250.dp)
+                                    .clickable { /* TODO: Implement video playback */ },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = "Video Player Placeholder")
+                                GlideImage(
+                                    model = animeDetails.imageUrl,
+                                    contentDescription = animeDetails.title,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(Color.Black.copy(alpha = 0.6f))
+                                        .padding(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.PlayArrow,
+                                        contentDescription = "Play Video",
+                                        modifier = Modifier.size(48.dp),
+                                        tint = Color.White
+                                    )
+                                }
                             }
                         }
                     }
@@ -88,33 +129,39 @@ fun DetailsScreen(
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 text = animeDetails.title,
-                                style = MaterialTheme.typography.headlineMedium
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(
+                            ExpandableText(
                                 text = animeDetails.synopsis ?: "No synopsis available.",
-                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            DetailItem(
+                                icon = Icons.Default.Movie,
+                                text = "Episodes: ${animeDetails.episodes}"
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            DetailItem(
+                                icon = Icons.Default.Star,
+                                text = "Score: ${animeDetails.score}"
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Genres: ${animeDetails.genres.joinToString { it.name }}",
-                                style = MaterialTheme.typography.bodySmall
+                                text = "Genres",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Episodes: ${animeDetails.episodes}",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Rating: ${animeDetails.rating}",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Score: ${animeDetails.score}",
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(5.dp)
+                            ) {
+                                animeDetails.genres.forEach { genre ->
+                                    GenreChip(genre = genre)
+                                }
+                            }
+
                         }
                     }
                 }
@@ -128,6 +175,66 @@ fun DetailsScreen(
             if (state.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
+        }
+    }
+}
+
+@Composable
+fun DetailItem(icon: ImageVector, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+        Text(text = text, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+@Composable
+fun GenreChip(genre: NamedResourceDto) {
+    AssistChip(
+        onClick = { },
+        label = { Text(text = genre.name) })
+}
+
+@Composable
+fun ExpandableText(text: String) {
+    var isExpanded by remember { mutableStateOf(false) }
+    var showToggle by remember(text) { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .animateContentSize()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                enabled = showToggle
+            ) { isExpanded = !isExpanded }
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = if (isExpanded) Int.MAX_VALUE else 5,
+            overflow = TextOverflow.Ellipsis,
+            onTextLayout = {
+                if (!showToggle) {
+                    showToggle = it.hasVisualOverflow
+                }
+            }
+        )
+
+        if (showToggle) {
+            Text(
+                text = if (isExpanded) "Show less" else "Show more",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(top = 4.dp)
+            )
         }
     }
 }
