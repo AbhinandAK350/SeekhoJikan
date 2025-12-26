@@ -1,5 +1,6 @@
 package com.abhinand.seekhojikan.home.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.abhinand.seekhojikan.core.navigation.Action
+import com.abhinand.seekhojikan.core.navigation.Screen
 import com.abhinand.seekhojikan.home.domain.model.Anime
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -42,7 +44,7 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Seekho Jikan") })
+            TopAppBar(title = { Text("Home") })
         }
     ) { paddingValues ->
 
@@ -66,7 +68,9 @@ fun HomeScreen(
                 else -> {
                     LazyColumn {
                         items(uiState.animeList) { anime ->
-                            AnimeListItem(anime = anime)
+                            AnimeListItem(anime = anime, onItemClick = {
+                                onNavigate(Action.Push(Screen.Details(it)))
+                            })
                         }
                     }
                 }
@@ -77,11 +81,12 @@ fun HomeScreen(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun AnimeListItem(anime: Anime) {
+fun AnimeListItem(anime: Anime, onItemClick: (Anime) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .clickable(onClick = { onItemClick(anime) })
     ) {
         GlideImage(
             model = anime.imageUrl,

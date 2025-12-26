@@ -1,5 +1,8 @@
 package com.abhinand.seekhojikan.home.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Anime(
     val malId: Int,
     val title: String,
