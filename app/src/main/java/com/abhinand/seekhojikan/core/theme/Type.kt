@@ -1,4 +1,4 @@
-package com.abhinand.seekhojikan.ui.theme
+package com.abhinand.seekhojikan.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
