@@ -1,13 +1,13 @@
 package com.abhinand.seekhojikan.home.data.mappers
 
-import com.abhinand.seekhojikan.home.data.remote.dto.AnimeDto
+import com.abhinand.seekhojikan.home.data.local.entity.AnimeEntity
 import com.abhinand.seekhojikan.home.domain.model.Anime
 
-fun AnimeDto.toDomain(): Anime {
+fun AnimeEntity.toDomain(): Anime {
     return Anime(
-        malId = mal_id,
+        malId = malId,
         title = title,
-        imageUrl = images.webp.large_image_url,
+        imageUrl = imageUrl,
         score = score,
         year = year,
         synopsis = synopsis,

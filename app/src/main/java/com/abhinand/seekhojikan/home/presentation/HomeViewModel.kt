@@ -7,8 +7,9 @@ import com.abhinand.seekhojikan.home.domain.usecase.GetTopAnimeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,22 +25,37 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun getTopAnimeList() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            when (val response = getTopAnimeUseCase()) {
+        getTopAnimeUseCase().onEach { result ->
+            when (result) {
                 is NetworkResource.Success -> {
                     _uiState.update {
                         it.copy(
-                            animeList = response.data ?: emptyList(),
-                            isLoading = false
+                            animeList = result.data ?: emptyList(),
+                            isLoading = false,
+                            isRefreshing = false
                         )
                     }
                 }
                 is NetworkResource.Error -> {
-                    _uiState.update { it.copy(error = response.message, isLoading = false) }
+                    _uiState.update {
+                        it.copy(
+                            error = result.message,
+                            isLoading = false,
+                            isRefreshing = false
+                        )
+                    }
                 }
-                is NetworkResource.Loading -> Unit
+
+                is NetworkResource.Loading -> {
+                    _uiState.update {
+                        if (it.animeList.isEmpty()) {
+                            it.copy(isLoading = true)
+                        } else {
+                            it.copy(isRefreshing = true)
+                        }
+                    }
+                }
             }
-        }
+        }.launchIn(viewModelScope)
     }
 }

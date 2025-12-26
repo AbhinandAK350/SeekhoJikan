@@ -5,5 +5,6 @@ import com.abhinand.seekhojikan.home.domain.model.Anime
 data class HomeState(
     val isLoading: Boolean = false,
     val animeList: List<Anime> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val isRefreshing: Boolean = false
 )

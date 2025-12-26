@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface HomeRepository {
 
-    suspend fun getAnimeList(): NetworkResource<List<Anime>>
+    fun getAnimeList(): Flow<NetworkResource<List<Anime>>>
 
 }

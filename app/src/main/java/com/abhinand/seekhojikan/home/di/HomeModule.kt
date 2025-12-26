@@ -1,5 +1,6 @@
 package com.abhinand.seekhojikan.home.di
 
+import com.abhinand.seekhojikan.home.data.local.dao.AnimeDao
 import com.abhinand.seekhojikan.home.data.remote.api.HomeApiService
 import com.abhinand.seekhojikan.home.data.repository.HomeRepositoryImpl
 import com.abhinand.seekhojikan.home.domain.repository.HomeRepository
@@ -23,8 +24,8 @@ object HomeModule {
 
     @Provides
     @Singleton
-    fun provideHomeRepository(apiService: HomeApiService): HomeRepository {
-        return HomeRepositoryImpl(apiService)
+    fun provideHomeRepository(apiService: HomeApiService, animeDao: AnimeDao): HomeRepository {
+        return HomeRepositoryImpl(apiService, animeDao)
     }
 
     @Provides
