@@ -2,6 +2,7 @@ package com.abhinand.seekhojikan.home.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.abhinand.seekhojikan.home.data.remote.dto.NamedResourceDto
 
 @Entity(tableName = "anime")
 data class AnimeEntity(
@@ -13,5 +14,8 @@ data class AnimeEntity(
     val year: Int?,
     val synopsis: String?,
     val rank: Int?,
-    val episodes: Int?
+    val episodes: Int?,
+    val youtubeId: String?,
+    val genres: List<NamedResourceDto>,
+    val rating: String
 )

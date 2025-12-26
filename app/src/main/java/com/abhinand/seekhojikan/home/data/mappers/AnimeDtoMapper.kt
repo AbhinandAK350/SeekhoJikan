@@ -12,6 +12,9 @@ fun AnimeDto.toEntity(): AnimeEntity {
         year = year,
         synopsis = synopsis,
         rank = rank,
-        episodes = episodes
+        episodes = episodes,
+        youtubeId = trailer.youtube_id,
+        genres = genres,
+        rating = rating
     )
 }

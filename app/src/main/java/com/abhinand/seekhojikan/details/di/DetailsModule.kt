@@ -5,6 +5,7 @@ import com.abhinand.seekhojikan.details.data.remote.api.DetailsApiService
 import com.abhinand.seekhojikan.details.data.repository.DetailsRepositoryImpl
 import com.abhinand.seekhojikan.details.domain.repository.DetailsRepository
 import com.abhinand.seekhojikan.details.domain.use_case.GetAnimeDetailsUseCase
+import com.abhinand.seekhojikan.home.data.local.dao.AnimeDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,8 +24,11 @@ object DetailsModule {
 
     @Provides
     @Singleton
-    fun provideDetailsRepository(apiService: DetailsApiService): DetailsRepository {
-        return DetailsRepositoryImpl(apiService)
+    fun provideDetailsRepository(
+        apiService: DetailsApiService,
+        animeDao: AnimeDao
+    ): DetailsRepository {
+        return DetailsRepositoryImpl(apiService, animeDao)
     }
 
     @Provides

@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,12 +22,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.abhinand.seekhojikan.core.navigation.Action
 import com.abhinand.seekhojikan.home.domain.model.Anime
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun DetailsScreen(
     anime: Anime,
@@ -41,24 +45,43 @@ fun DetailsScreen(
     }
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text(anime.title) }, navigationIcon = {
-            IconButton(onClick = { onNavigate(Action.Pop) }) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-            }
-        })
-    }) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        TopAppBar(
+            title = { Text(anime.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            navigationIcon = {
+                IconButton(onClick = { onNavigate(Action.Pop) }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            })
+    }) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             state.animeDetails?.let { animeDetails ->
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     item {
-                        // VideoPlayer composable will be here
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(250.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "Video Player Placeholder")
+                        if (animeDetails.youtubeId.isNullOrEmpty()) {
+                            GlideImage(
+                                model = animeDetails.imageUrl,
+                                contentDescription = animeDetails.title,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(350.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(250.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = "Video Player Placeholder")
+                            }
                         }
                     }
                     item {
@@ -69,12 +92,12 @@ fun DetailsScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = animeDetails.synopsis,
+                                text = animeDetails.synopsis ?: "No synopsis available.",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Genres: ${animeDetails.genres.joinToString()}",
+                                text = "Genres: ${animeDetails.genres.joinToString { it.name }}",
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Spacer(modifier = Modifier.height(8.dp))
