@@ -8,8 +8,8 @@ offline.
 
 ## ✨ Features
 
-- **Discover Top Anime:** Browse a curated list of the top anime series, complete with high-quality
-  poster images, ratings, and episode counts.
+- **Discover Top Anime:** Browse a paginated list of the top anime series. The app automatically
+  loads more as you scroll.
 - **Detailed Information:** Dive deeper into any anime to view its full synopsis, genre tags, and
   other relevant details.
 - **Offline Caching:** Powered by Room, the app caches data locally, allowing you to browse
@@ -69,7 +69,7 @@ testable, and maintainable.
 This app uses the public [Jikan API](https://jikan.moe/) to fetch anime data. The following
 endpoints are used:
 
-- `GET /v4/top/anime`: Fetches the top anime series.
+- `GET /v4/top/anime`: Fetches a paginated list of the top anime series.
 - `GET /v4/anime/{id}`: Fetches detailed information for a specific anime.
 
 ## 🛑 Known Limitations
