@@ -48,11 +48,7 @@ fun AppNavigation() {
                     handleNavigation(action)
                 })
             }
-        }, transitionSpec = {
-            EnterTransition.None togetherWith ExitTransition.None
         }, predictivePopTransitionSpec = {
-            EnterTransition.None togetherWith ExitTransition.None
-        }, popTransitionSpec = {
             EnterTransition.None togetherWith ExitTransition.None
         }
     )
