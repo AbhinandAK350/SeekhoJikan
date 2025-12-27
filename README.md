@@ -57,12 +57,15 @@ testable, and maintainable.
 - **Kotlin:** First-party language for Android development.
 - **Jetpack Compose:** Modern toolkit for building native Android UI.
 - **Coroutines & Flow:** For asynchronous and reactive programming.
-- **MVVM:** Recommended architectural pattern for robust apps.
+- **MVVM Architecture:** Recommended architectural pattern for robust apps.
+- **Navigation 3:** For navigating between composable screens.
 - **Hilt:** For dependency injection.
 - **Retrofit:** For type-safe HTTP calls to the Jikan API.
+- **OkHttp:** For intercepting and logging network requests.
 - **Room:** For local database and offline caching.
 - **Glide:** For efficient image loading and caching.
-- **Navigation-Compose:** For navigating between composable screens.
+- **Kotlinx Serialization:** For parsing JSON from the API.
+- **Android YouTube Player:** For embedding YouTube videos.
 
 ## 🔌 API Reference
 
