@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface HomeRepository {
 
-    fun getAnimeList(forceRefresh: Boolean = false, page: Int): Flow<NetworkResource<List<Anime>>>
+    fun getAnimeList(page: Int): Flow<NetworkResource<List<Anime>>>
 
 }

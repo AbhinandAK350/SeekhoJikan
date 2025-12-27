@@ -15,42 +15,32 @@ class HomeRepositoryImpl @Inject constructor(
     private val apiService: HomeApiService,
     private val animeDao: AnimeDao
 ) : HomeRepository {
-    override fun getAnimeList(
-        forceRefresh: Boolean,
-        page: Int
-    ): Flow<NetworkResource<List<Anime>>> = flow {
+
+    private val pageSize = 25
+
+    override fun getAnimeList(page: Int): Flow<NetworkResource<List<Anime>>> = flow {
         emit(NetworkResource.Loading)
 
-        val pageSize = 25 // Default page size for Jikan API
-
         try {
-            // Online path
-            val response = apiService.getTopAnime(page = page)
-            val remoteAnimeList = response.data.map { it.toEntity() }
+            val response = apiService.getTopAnime(page)
+            val entities = response.data.map { it.toEntity() }
 
-            if (forceRefresh) {
+            if (page == 1) {
                 animeDao.clearAll()
             }
-            animeDao.insertAnimeList(remoteAnimeList)
 
-            // For online, just emit the data we just fetched and inserted
-            emit(NetworkResource.Success(remoteAnimeList.map { it.toDomain() }))
+            animeDao.insertAnimeList(entities)
 
+            emit(NetworkResource.Success(entities.map { it.toDomain() }))
         } catch (e: Exception) {
-            // Offline path
             val offset = (page - 1) * pageSize
-            val localAnimeList = animeDao.getAnimeList(limit = pageSize, offset = offset)
+            val cached = animeDao.getAnimeList(pageSize, offset)
                 .map { it.toDomain() }
 
-            if (localAnimeList.isNotEmpty()) {
-                emit(NetworkResource.Success(localAnimeList))
+            if (cached.isNotEmpty()) {
+                emit(NetworkResource.Success(cached))
             } else {
-                if (page == 1) {
-                    emit(NetworkResource.Error(e.message ?: "Unknown error occurred"))
-                } else {
-                    // Reached end of pagination in offline mode
-                    emit(NetworkResource.Success(emptyList()))
-                }
+                emit(NetworkResource.Error(e.message ?: "Network error"))
             }
         }
     }

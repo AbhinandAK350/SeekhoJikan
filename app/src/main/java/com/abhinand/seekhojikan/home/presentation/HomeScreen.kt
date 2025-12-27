@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WifiOff
@@ -54,31 +53,31 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val listState = rememberLazyListState()
 
     Scaffold(
         topBar = {
-            TopAppBar(title = {
-                Text(
-                    "Home",
-                    fontSize = MaterialTheme.typography.headlineLarge.fontSize,
-                    fontWeight = FontWeight.W700
-                )
-            })
+            TopAppBar(
+                title = {
+                    Text(
+                        "Home",
+                        fontSize = MaterialTheme.typography.headlineLarge.fontSize,
+                        fontWeight = FontWeight.W700
+                    )
+                }
+            )
         }
     ) { paddingValues ->
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
             when {
-                uiState.isLoading -> {
+                uiState.isLoading && uiState.animeList.isEmpty() -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
 
-                uiState.isNetworkError -> {
+                uiState.isNetworkError && uiState.animeList.isEmpty() -> {
                     NetworkError(modifier = Modifier.align(Alignment.Center))
                 }
 
@@ -90,34 +89,39 @@ fun HomeScreen(
                 }
 
                 else -> {
-                    LazyColumn(state = listState) {
+                    LazyColumn {
                         itemsIndexed(
-                            uiState.animeList,
-                            key = { _, anime -> anime.malId }) { index, anime ->
-                            AnimeListItem(anime = anime, onItemClick = {
+                            items = uiState.animeList,
+                            key = { _, anime -> anime.malId }
+                        ) { index, anime ->
+                            AnimeListItem(anime = anime) {
                                 onNavigate(Action.Push(Screen.Details(it)))
-                            })
+                            }
 
-                            if (index == uiState.animeList.size - 1 && !uiState.isLoadingNextPage) {
+                            if (
+                                index == uiState.animeList.lastIndex &&
+                                !uiState.isLoading &&
+                                !uiState.endReached
+                            ) {
                                 LaunchedEffect(Unit) {
                                     viewModel.onEvent(HomeEvent.OnLoadNextPage)
                                 }
                             }
                         }
-                        if (uiState.isLoadingNextPage) {
+
+                        if (uiState.isLoading && uiState.animeList.isNotEmpty()) {
                             item {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(16.dp)
                                 ) {
-                                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.align(Alignment.Center)
+                                    )
                                 }
                             }
                         }
-                    }
-                    if (uiState.isRefreshing) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
                 }
             }
