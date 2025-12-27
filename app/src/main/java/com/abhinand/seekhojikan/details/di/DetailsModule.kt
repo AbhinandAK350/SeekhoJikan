@@ -4,7 +4,7 @@ import com.abhinand.seekhojikan.core.network.RetrofitClient
 import com.abhinand.seekhojikan.details.data.remote.api.DetailsApiService
 import com.abhinand.seekhojikan.details.data.repository.DetailsRepositoryImpl
 import com.abhinand.seekhojikan.details.domain.repository.DetailsRepository
-import com.abhinand.seekhojikan.details.domain.use_case.GetAnimeDetailsUseCase
+import com.abhinand.seekhojikan.details.domain.usecase.GetAnimeDetailsUseCase
 import com.abhinand.seekhojikan.home.data.local.dao.AnimeDao
 import dagger.Module
 import dagger.Provides

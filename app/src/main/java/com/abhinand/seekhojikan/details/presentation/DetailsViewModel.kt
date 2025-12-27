@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhinand.seekhojikan.core.network.NetworkResource
 import com.abhinand.seekhojikan.core.utils.ConnectivityObserver
-import com.abhinand.seekhojikan.details.domain.use_case.GetAnimeDetailsUseCase
+import com.abhinand.seekhojikan.details.domain.usecase.GetAnimeDetailsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

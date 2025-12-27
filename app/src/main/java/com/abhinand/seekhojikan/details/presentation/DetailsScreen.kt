@@ -81,6 +81,7 @@ fun DetailsScreen(
     val state = viewModel.state.value
     val context = LocalContext.current
 
+    // Fetch anime details when the screen is first composed
     LaunchedEffect(key1 = anime.malId) {
         viewModel.getAnimeDetails(anime.malId)
     }
@@ -113,6 +114,7 @@ fun DetailsScreen(
                 state.animeDetails?.let { animeDetails ->
                     var showConfirmationDialog by remember { mutableStateOf(false) }
 
+                    // Dialog to confirm redirection to YouTube
                     if (showConfirmationDialog) {
                         val videoId = Util.extractYouTubeVideoId(animeDetails.embeddedUrl ?: "")
                         AlertDialog(
@@ -147,6 +149,7 @@ fun DetailsScreen(
                         item {
                             var showPoster by remember { mutableStateOf(false) }
 
+                            // Show poster if trailer is not available or user wants to see it
                             if (animeDetails.embeddedUrl.isNullOrEmpty() || showPoster || !state.isOnline) {
                                 Box(
                                     modifier = Modifier
@@ -154,6 +157,7 @@ fun DetailsScreen(
                                         .height(350.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
+                                    // Show image if feature flag is enabled
                                     if (FeatureFlags.SHOW_IMAGES) {
                                         GlideImage(
                                             model = animeDetails.imageUrl,
@@ -190,6 +194,7 @@ fun DetailsScreen(
                                             }
                                         )
                                     } else {
+                                        // Show a placeholder if images are disabled
                                         Box(
                                             modifier = Modifier
                                                 .fillMaxSize()
@@ -204,6 +209,7 @@ fun DetailsScreen(
                                         }
                                     }
 
+                                    // Show play button on poster if a trailer is available
                                     if (showPoster && !animeDetails.embeddedUrl.isNullOrEmpty()) {
                                         val videoId =
                                             Util.extractYouTubeVideoId(animeDetails.embeddedUrl)
@@ -232,6 +238,7 @@ fun DetailsScreen(
                                     }
                                 }
                             } else {
+                                // Embed YouTube player
                                 val lifecycleOwner = LocalLifecycleOwner.current
                                 val youtubePlayerView = remember {
                                     YouTubePlayerView(context).apply {
@@ -241,6 +248,7 @@ fun DetailsScreen(
 
                                 var playerHasError by remember { mutableStateOf(false) }
 
+                                // If player has error, show poster after a delay
                                 LaunchedEffect(playerHasError) {
                                     if (playerHasError) {
                                         delay(1000)
@@ -283,6 +291,7 @@ fun DetailsScreen(
                             }
                         }
                         item {
+                            // Anime details section
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
                                     text = animeDetails.title,
@@ -328,6 +337,9 @@ fun DetailsScreen(
     }
 }
 
+/**
+ * A composable that displays a detail item with an icon and text.
+ */
 @Composable
 fun DetailItem(icon: ImageVector, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -341,6 +353,9 @@ fun DetailItem(icon: ImageVector, text: String) {
     }
 }
 
+/**
+ * A composable that displays a genre chip.
+ */
 @Composable
 fun GenreChip(genre: NamedResourceDto) {
     AssistChip(
@@ -348,6 +363,9 @@ fun GenreChip(genre: NamedResourceDto) {
         label = { Text(text = genre.name) })
 }
 
+/**
+ * A composable that displays text that can be expanded and collapsed.
+ */
 @Composable
 fun ExpandableText(text: String) {
     var isExpanded by remember { mutableStateOf(false) }

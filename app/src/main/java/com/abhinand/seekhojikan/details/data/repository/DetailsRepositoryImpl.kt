@@ -13,20 +13,30 @@ import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import javax.inject.Inject
 
+/**
+ * Repository for anime details, providing a single source of truth for data.
+ * It fetches data from the network and caches it locally.
+ */
 class DetailsRepositoryImpl @Inject constructor(
     private val apiService: DetailsApiService,
     private val animeDao: AnimeDao
 ) : DetailsRepository {
 
+    /**
+     * Get anime details from the network and cache it.
+     * If the network is unavailable, it will return cached data if it exists.
+     */
     override fun getAnimeDetails(id: Int): Flow<NetworkResource<AnimeDetails>> = flow {
         emit(NetworkResource.Loading)
 
         try {
+            // Fetch from network, save to DB
             val animeDetails = apiService.getAnimeDetails(id).toDomain()
             animeDao.updateAnime(animeDetails.toEntity())
 
             emit(NetworkResource.Success(animeDetails))
         } catch (e: IOException) {
+            // On network error, try to load from DB
             val animeFromDb = animeDao.getAnime(id)
             if (animeFromDb != null) {
                 emit(NetworkResource.Success(animeFromDb.toDetailsDomain()))
@@ -34,6 +44,7 @@ class DetailsRepositoryImpl @Inject constructor(
                 emit(NetworkResource.Error("Couldn't reach server and no cached data available."))
             }
         } catch (e: Exception) {
+            // Handle other errors
             e.printStackTrace()
             emit(NetworkResource.Error("An unexpected error occurred: ${e.message}"))
         }
