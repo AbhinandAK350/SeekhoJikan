@@ -24,11 +24,17 @@ offline.
 
 ## 📸 Screenshots
 
-*(Here you can add screenshots of your app. For example:)*
+### 🌞 Light Theme
 
-| Home Screen                          | Details Screen                             |
-|--------------------------------------|--------------------------------------------|
-| ![Home Screen](screenshots/Home.jpg) | ![Details Screen](screenshots/Details.jpg) |
+| Home Screen                                         | Details Screen                                         |
+|-----------------------------------------------------|--------------------------------------------------------|
+| <img src="screenshots/Home_Light.jpg" width="220"/> | <img src="screenshots/Details_Light.jpg" width="220"/> |
+
+### 🌙 Dark Theme
+
+| Home Screen                                        | Details Screen                                        |
+|----------------------------------------------------|-------------------------------------------------------|
+| <img src="screenshots/Home_Dark.jpg" width="220"/> | <img src="screenshots/Details_Dark.jpg" width="220"/> |
 
 ## 🏗️ Architecture
 
