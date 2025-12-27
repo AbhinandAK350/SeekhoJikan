@@ -1,7 +1,6 @@
 package com.abhinand.seekhojikan.details.presentation
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -14,13 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,19 +36,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.abhinand.seekhojikan.core.navigation.Action
+import com.abhinand.seekhojikan.details.util.Util
 import com.abhinand.seekhojikan.home.data.remote.dto.NamedResourceDto
 import com.abhinand.seekhojikan.home.domain.model.Anime
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -61,6 +62,7 @@ fun DetailsScreen(
     onNavigate: (Action) -> Unit
 ) {
     val state = viewModel.state.value
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = anime.malId) {
         viewModel.getAnimeDetails(anime.malId)
@@ -86,42 +88,46 @@ fun DetailsScreen(
             state.animeDetails?.let { animeDetails ->
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     item {
-                        if (animeDetails.youtubeId.isNullOrEmpty()) {
+                        if (animeDetails.embeddedUrl.isNullOrEmpty()) {
                             GlideImage(
                                 model = animeDetails.imageUrl,
                                 contentDescription = animeDetails.title,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(350.dp),
-                                contentScale = ContentScale.Fit
+                                contentScale = ContentScale.Crop
                             )
                         } else {
-                            Box(
+                            val lifecycleOwner =
+                                androidx.lifecycle.compose.LocalLifecycleOwner.current
+                            val youtubePlayerView = remember {
+                                YouTubePlayerView(context).apply {
+                                    lifecycleOwner.lifecycle.addObserver(this)
+                                }
+                            }
+
+                            DisposableEffect(lifecycleOwner) {
+                                onDispose {
+                                    lifecycleOwner.lifecycle.removeObserver(youtubePlayerView)
+                                }
+                            }
+
+                            AndroidView(
+                                factory = { youtubePlayerView },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(250.dp)
-                                    .clickable { /* TODO: Implement video playback */ },
-                                contentAlignment = Alignment.Center
                             ) {
-                                GlideImage(
-                                    model = animeDetails.imageUrl,
-                                    contentDescription = animeDetails.title,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .background(Color.Black.copy(alpha = 0.6f))
-                                        .padding(8.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.PlayArrow,
-                                        contentDescription = "Play Video",
-                                        modifier = Modifier.size(48.dp),
-                                        tint = Color.White
-                                    )
-                                }
+                                it.addYouTubePlayerListener(object :
+                                    AbstractYouTubePlayerListener() {
+                                    override fun onReady(youTubePlayer: YouTubePlayer) {
+                                        youTubePlayer.cueVideo(
+                                            Util.extractYouTubeVideoId(
+                                                animeDetails.embeddedUrl
+                                            ) ?: "", 0f
+                                        )
+                                    }
+                                })
                             }
                         }
                     }

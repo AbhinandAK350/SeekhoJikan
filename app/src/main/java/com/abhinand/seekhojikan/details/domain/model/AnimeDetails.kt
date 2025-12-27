@@ -6,7 +6,7 @@ data class AnimeDetails(
     val id: Int,
     val title: String,
     val imageUrl: String,
-    val youtubeId: String?,
+    val embeddedUrl: String?,
     val synopsis: String,
     val genres: List<NamedResourceDto>,
     val episodes: Int,

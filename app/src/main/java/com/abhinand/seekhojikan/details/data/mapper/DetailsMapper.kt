@@ -9,7 +9,7 @@ fun AnimeDetailsDto.toDomain(): AnimeDetails {
         id = data.mal_id,
         title = data.title,
         imageUrl = data.images.jpg.large_image_url ?: data.images.jpg.image_url ?: "",
-        youtubeId = data.trailer?.youtube_id ?: "",
+        embeddedUrl = data.trailer?.embed_url ?: "",
         synopsis = data.synopsis ?: "No Synopsis Available",
         genres = data.genres,
         episodes = data.episodes ?: 0,
@@ -23,7 +23,7 @@ fun AnimeEntity.toDetailsDomain(): AnimeDetails {
         id = malId,
         title = title,
         imageUrl = imageUrl,
-        youtubeId = youtubeId,
+        embeddedUrl = embeddedUrl,
         synopsis = synopsis ?: "No synopsis available.",
         genres = genres,
         episodes = episodes ?: 0,
@@ -42,7 +42,7 @@ fun AnimeDetails.toEntity(): AnimeEntity {
         score = null,
         year = null,
         rank = null,
-        youtubeId = youtubeId,
+        embeddedUrl = embeddedUrl,
         genres = genres,
         rating = rating
     )

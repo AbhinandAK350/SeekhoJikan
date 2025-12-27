@@ -15,7 +15,7 @@ data class AnimeEntity(
     val synopsis: String?,
     val rank: Int?,
     val episodes: Int?,
-    val youtubeId: String?,
+    val embeddedUrl: String?,
     val genres: List<NamedResourceDto>,
     val rating: String
 )

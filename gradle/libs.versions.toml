@@ -19,6 +19,7 @@ nav3Lifecycle = "2.10.0"
 retrofit = "3.0.0"
 room = "2.8.4"
 serializationConverter = "1.0.0"
+youtubePlayer = "12.1.0"
 
 [libraries]
 # AndroidX
@@ -60,6 +61,9 @@ glide-compose = { group = "com.github.bumptech.glide", name = "compose", version
 # Serialization
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "serializationConverter" }
+
+# YouTube Player
+youtube-player = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "core", version.ref = "youtubePlayer" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
