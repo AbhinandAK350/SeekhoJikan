@@ -187,7 +187,11 @@ fun AnimeListItem(anime: Anime, onItemClick: (Anime) -> Unit) {
                                 .background(Color.Gray),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator()
+                            Icon(
+                                imageVector = Icons.Default.BrokenImage,
+                                contentDescription = "Image unavailable",
+                                tint = Color.White
+                            )
                         }
                     },
                     failure = placeholder {
