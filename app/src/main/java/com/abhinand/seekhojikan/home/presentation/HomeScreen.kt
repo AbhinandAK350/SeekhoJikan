@@ -1,5 +1,6 @@
 package com.abhinand.seekhojikan.home.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,17 +36,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.abhinand.seekhojikan.core.config.FeatureFlags
 import com.abhinand.seekhojikan.core.navigation.Action
 import com.abhinand.seekhojikan.core.navigation.Screen
 import com.abhinand.seekhojikan.home.domain.model.Anime
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -166,15 +171,55 @@ fun AnimeListItem(anime: Anime, onItemClick: (Anime) -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            GlideImage(
-                model = anime.imageUrl,
-                contentDescription = anime.title,
-                modifier = Modifier
-                    .width(100.dp)
-                    .aspectRatio(2f / 3f)
-                    .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)),
-                contentScale = ContentScale.Crop,
-            )
+            if (FeatureFlags.SHOW_IMAGES) {
+                GlideImage(
+                    model = anime.imageUrl,
+                    contentDescription = anime.title,
+                    modifier = Modifier
+                        .width(100.dp)
+                        .aspectRatio(2f / 3f)
+                        .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)),
+                    contentScale = ContentScale.Crop,
+                    loading = placeholder {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Gray),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    },
+                    failure = placeholder {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Gray),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.BrokenImage,
+                                contentDescription = "Image unavailable",
+                                tint = Color.White
+                            )
+                        }
+                    }
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .aspectRatio(2f / 3f)
+                        .background(Color.Gray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.BrokenImage,
+                        contentDescription = "Image unavailable",
+                        tint = Color.White
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .padding(16.dp)

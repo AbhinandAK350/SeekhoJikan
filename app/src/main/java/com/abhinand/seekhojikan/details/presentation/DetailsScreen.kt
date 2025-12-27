@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
@@ -56,12 +57,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.abhinand.seekhojikan.core.config.FeatureFlags
 import com.abhinand.seekhojikan.core.navigation.Action
 import com.abhinand.seekhojikan.details.util.Util
 import com.abhinand.seekhojikan.home.data.remote.dto.NamedResourceDto
 import com.abhinand.seekhojikan.home.domain.model.Anime
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
@@ -151,12 +154,51 @@ fun DetailsScreen(
                                         .height(350.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    GlideImage(
-                                        model = animeDetails.imageUrl,
-                                        contentDescription = animeDetails.title,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
+                                    if (FeatureFlags.SHOW_IMAGES) {
+                                        GlideImage(
+                                            model = animeDetails.imageUrl,
+                                            contentDescription = animeDetails.title,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop,
+                                            loading = placeholder {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxSize()
+                                                        .background(Color.Gray),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    CircularProgressIndicator()
+                                                }
+                                            },
+                                            failure = placeholder {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxSize()
+                                                        .background(Color.Gray),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.BrokenImage,
+                                                        contentDescription = "Image unavailable",
+                                                        tint = Color.White
+                                                    )
+                                                }
+                                            }
+                                        )
+                                    } else {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(Color.Gray),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.BrokenImage,
+                                                contentDescription = "Image unavailable",
+                                                tint = Color.White
+                                            )
+                                        }
+                                    }
 
                                     if (showPoster && !animeDetails.embeddedUrl.isNullOrEmpty()) {
                                         val videoId =
