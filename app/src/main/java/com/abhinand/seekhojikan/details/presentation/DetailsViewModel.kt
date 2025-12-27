@@ -24,8 +24,10 @@ class DetailsViewModel @Inject constructor(
     private var animeId: Int? = null
 
     init {
-        connectivityObserver.observe().onEach {
-            if (it == ConnectivityObserver.Status.Available) {
+        connectivityObserver.observe().onEach { status ->
+            val isOnline = status == ConnectivityObserver.Status.Available
+            _state.value = _state.value.copy(isOnline = isOnline)
+            if (isOnline) {
                 animeId?.let { id -> getAnimeDetails(id) }
             }
         }.launchIn(viewModelScope)
@@ -36,16 +38,20 @@ class DetailsViewModel @Inject constructor(
         getAnimeDetailsUseCase(id).onEach {
             when (it) {
                 is NetworkResource.Loading -> {
-                    _state.value = DetailsState(isLoading = true)
+                    _state.value = _state.value.copy(isLoading = true)
                 }
 
                 is NetworkResource.Success -> {
-                    _state.value = DetailsState(animeDetails = it.data)
+                    _state.value =
+                        _state.value.copy(isLoading = false, animeDetails = it.data, error = null)
                 }
 
                 is NetworkResource.Error -> {
                     _state.value =
-                        DetailsState(error = it.message ?: "An unexpected error occurred")
+                        _state.value.copy(
+                            isLoading = false,
+                            error = it.message ?: "An unexpected error occurred"
+                        )
                 }
             }
         }.launchIn(viewModelScope)

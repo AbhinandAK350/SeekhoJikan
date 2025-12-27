@@ -5,5 +5,6 @@ import com.abhinand.seekhojikan.details.domain.model.AnimeDetails
 data class DetailsState(
     val animeDetails: AnimeDetails? = null,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isOnline: Boolean = true
 )
