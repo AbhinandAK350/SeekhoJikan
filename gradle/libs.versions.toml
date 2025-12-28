@@ -19,7 +19,7 @@ nav3Lifecycle = "2.10.0"
 retrofit = "3.0.0"
 room = "2.8.4"
 serializationConverter = "1.0.0"
-youtubePlayer = "12.1.0"
+youtubePlayer = "13.0.0"
 
 [libraries]
 # AndroidX
