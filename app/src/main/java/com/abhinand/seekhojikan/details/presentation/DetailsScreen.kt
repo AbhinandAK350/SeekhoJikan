@@ -1,7 +1,10 @@
 package com.abhinand.seekhojikan.details.presentation
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +26,7 @@ import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -107,8 +112,10 @@ fun DetailsScreen(
             val isOnline = state.isOnline
             val context = LocalContext.current
             val lifecycleOwner = LocalLifecycleOwner.current
-            var showPoster by rememberSaveable { mutableStateOf(false) }
+            var showPoster by rememberSaveable { mutableStateOf(true) }
             var playerHasError by rememberSaveable { mutableStateOf(false) }
+            var showYouTubeRedirectDialog by remember { mutableStateOf(false) }
+
 
             LaunchedEffect(playerHasError) {
                 if (playerHasError) {
@@ -129,10 +136,14 @@ fun DetailsScreen(
                     item {
                         PosterView(
                             imageUrl = animeDetails?.imageUrl,
-                            hasTrailer = !animeDetails?.embeddedUrl.isNullOrEmpty(),
+                            hasTrailer = !animeDetails?.embeddedUrl.isNullOrEmpty() && isOnline,
                             onPlayClicked = {
-                                showPoster = false
-                                playerHasError = false
+                                if (playerHasError) {
+                                    showYouTubeRedirectDialog = true
+                                } else {
+                                    showPoster = false
+                                    playerHasError = false
+                                }
                             }
                         )
                     }
@@ -167,7 +178,7 @@ fun DetailsScreen(
                         view.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
 
                             override fun onReady(player: YouTubePlayer) {
-                                player.cueVideo(
+                                player.loadVideo(
                                     Util.extractYouTubeVideoId(animeDetails.embeddedUrl) ?: "",
                                     0f
                                 )
@@ -190,6 +201,41 @@ fun DetailsScreen(
                         }
                     }
                 }
+            }
+            if (showYouTubeRedirectDialog) {
+                AlertDialog(
+                    onDismissRequest = { showYouTubeRedirectDialog = false },
+                    title = { Text("Playback Error") },
+                    text = { Text("There was an error playing the video. Would you like to watch it on YouTube?") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showYouTubeRedirectDialog = false
+                                animeDetails?.embeddedUrl?.let { url ->
+                                    val videoId = Util.extractYouTubeVideoId(url)
+                                    val appIntent =
+                                        Intent(
+                                            Intent.ACTION_VIEW,
+                                            Uri.parse("vnd.youtube:$videoId")
+                                        )
+                                    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                    try {
+                                        context.startActivity(appIntent)
+                                    } catch (e: Exception) {
+                                        context.startActivity(webIntent)
+                                    }
+                                }
+                            }
+                        ) {
+                            Text("Yes")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showYouTubeRedirectDialog = false }) {
+                            Text("No")
+                        }
+                    }
+                )
             }
         }
     }
@@ -233,16 +279,17 @@ fun PosterView(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(64.dp)
+                        .size(80.dp)
                         .clip(CircleShape)
-                        .background(Color.Black.copy(alpha = 0.6f)),
+                        .background(Color.Black.copy(alpha = 0.6f))
+                        .border(2.dp, Color.White, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
-                        contentDescription = null,
+                        contentDescription = "Play Trailer",
                         tint = Color.White,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(56.dp)
                     )
                 }
             }
