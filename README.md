@@ -19,7 +19,8 @@ offline.
 - **Error Handling:** Gracefully handles network and API errors to keep the user informed.
 - **Trailer Support with Graceful Fallback:**
   Anime trailers are displayed using a best-effort inline YouTube player. When embedded playback is
-  unavailable due to YouTube restrictions, the app gracefully falls back to displaying the anime
+  unavailable due to YouTube restrictions or playback error, the app gracefully falls back to
+  displaying the anime
   poster and offers the option to open the trailer in the YouTube app.
 
 ## 📸 Screenshots
@@ -74,15 +75,6 @@ endpoints are used:
 
 - `GET /v4/top/anime`: Fetches a paginated list of the top anime series.
 - `GET /v4/anime/{id}`: Fetches detailed information for a specific anime.
-
-## 🛑 Known Limitations
-
-- **YouTube Trailer Playback Limitations:** Trailers provided by the Jikan API often link to YouTube
-  videos. YouTube does not guarantee embedded playback in Android apps for all videos due to
-  licensing, regional, and policy
-  restrictions. The app attempts inline playback using the official YouTube IFrame Player API and
-  automatically falls back to displaying the anime poster with an option to open the trailer in the
-  YouTube app when embedded playback is unavailable.
 
 ## 🤔 Assumptions Made
 
